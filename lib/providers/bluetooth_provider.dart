@@ -19,6 +19,9 @@ class BluetoothProvider extends ChangeNotifier {
   /// list of nearby and scanned [BluetoothDevices]
   late List<BluetoothDevice> _detectedDevices;
 
+  /// list of nearby [BluetoothDevices]
+  late List<BluetoothDevice> _nearbyDevices;
+
   late List<BluetoothService> _services;
 
   /// connected [BluetoothDevice]
@@ -35,6 +38,7 @@ class BluetoothProvider extends ChangeNotifier {
     bool status = await bluetoothStatus();
     await stopScan();
     if (status) {
+      _nearbyDevices = [];
       scanAndPopulateList();
     }
   }
@@ -43,6 +47,8 @@ class BluetoothProvider extends ChangeNotifier {
   void scanAndPopulateList() {
     _flutterBluePlus.connectedDevices.asStream().listen(addConnectedDevice);
     _flutterBluePlus.scanResults.listen(addScannedDevice);
+
+    _detectedDevices = _nearbyDevices;
     _flutterBluePlus.startScan();
   }
 
@@ -62,8 +68,9 @@ class BluetoothProvider extends ChangeNotifier {
 
   /// function to add distinct [BluetoothDevice] to [_detectedDevices]
   void addDeviceToList(BluetoothDevice bluetoothDevice) {
-    if (!_detectedDevices.contains(bluetoothDevice)) {
-      _detectedDevices.add(bluetoothDevice);
+    if (!_nearbyDevices.contains(bluetoothDevice)) {
+      _nearbyDevices.add(bluetoothDevice);
+      debugPrint(bluetoothDevice.toString());
       notifyListeners();
     }
   }
