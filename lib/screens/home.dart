@@ -1,3 +1,4 @@
+import 'package:ble_app/providers/bluetooth_provider.dart';
 import 'package:ble_app/theme/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class Home extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // todo: bluetooth scan functionality
+          BluetoothProvider().startScan();
         },
         backgroundColor: darkBlueGrayColor,
         splashColor: Colors.transparent,

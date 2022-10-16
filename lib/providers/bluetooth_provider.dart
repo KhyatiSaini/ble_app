@@ -33,6 +33,7 @@ class BluetoothProvider extends ChangeNotifier {
   /// function to start scan and populate [_detectedDevices] list if bluetooth is active
   Future startScan() async {
     bool status = await bluetoothStatus();
+    await stopScan();
     if (status) {
       scanAndPopulateList();
     }
@@ -92,7 +93,7 @@ class BluetoothProvider extends ChangeNotifier {
         disconnectDevice();
       }).then((value) {
         if (returnValue == null) {
-          debugPrint('connection successful');
+          debugPrint('connection successful, connected to $deviceDisplayName');
 
           _connectedDevice = selectedBluetoothDevice;
           discoverServices();
@@ -101,7 +102,7 @@ class BluetoothProvider extends ChangeNotifier {
       });
     } on PlatformException catch (e) {
       if (e.code == 'already connected') {
-        debugPrint('already connected to the device');
+        debugPrint('already connected to the device $deviceDisplayName');
         _connectedDevice = selectedBluetoothDevice;
         discoverServices();
         notifyListeners();
