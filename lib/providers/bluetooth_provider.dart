@@ -22,10 +22,19 @@ class BluetoothProvider extends ChangeNotifier {
   /// list of nearby [BluetoothDevices]
   late List<BluetoothDevice> _nearbyDevices;
 
+  /// list of all bluetooth services advertised by connected devices
   late List<BluetoothService> _services;
 
   /// connected [BluetoothDevice]
   BluetoothDevice? _connectedDevice;
+
+  // GATT Profile for BLE communication
+  static const brainServiceUUID = 'ca30c812-3ed5-44ea-961e-196a8c601de7';
+  static const characteristicErrorUUID = '1db9a7de-135f-4509-b226-bd19d42126fd';
+
+  /// [BluetoothService] and [BluetoothCharacteristic] for BLE communication
+  BluetoothService? brainService;
+  BluetoothCharacteristic? errorCharacteristic;
 
   /// function that returns status of Bluetooth
   Future<bool> bluetoothStatus() async {
@@ -127,7 +136,37 @@ class BluetoothProvider extends ChangeNotifier {
   Future<void> discoverServices() async {
     if (_connectedDevice != null) {
       _services = await _connectedDevice!.discoverServices();
+
+      // todo: based on the discovery of brain service and error characteristic, notify the status of communication compatibility
+      bool discoverSuccessful = discoverBrainNodes();
     }
+  }
+
+  /// discover the brain service and error characteristic
+  bool discoverBrainNodes() {
+    for (BluetoothService bluetoothService in _services) {
+      if (bluetoothService.uuid.toString() == brainServiceUUID) {
+        brainService = bluetoothService;
+        break;
+      }
+    }
+
+    // if brain service is found with the connected device, assign characteristic
+    if (brainService != null) {
+      for (BluetoothCharacteristic characteristic
+          in brainService!.characteristics) {
+        if (characteristic.uuid.toString() == characteristicErrorUUID) {
+          errorCharacteristic = characteristic;
+          break;
+        }
+      }
+    }
+
+    if (brainService == null || errorCharacteristic == null) {
+      return false;
+    }
+
+    return true;
   }
 
   /// function to read data of a particular [characteristic]

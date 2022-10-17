@@ -117,17 +117,94 @@ class Home extends StatelessWidget {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // todo: bluetooth scan functionality
-          BluetoothProvider().startScan();
+      floatingActionButton: Consumer<BluetoothStatusProvider>(
+        builder: (context, bluetoothStatusProvider, child) {
+          bool bluetoothStatus = (bluetoothStatusProvider.bluetoothState ==
+                  BluetoothConnectionStatus.on)
+              ? true
+              : false;
+
+          return FloatingActionButton(
+            onPressed: () {
+              /// if bluetooth is turned on, start the scan by calling [startScan] function of [BluetoothProvider]
+              /// else display a dialog box asking the user to turn on bluetooth for using the app
+              if (bluetoothStatus) {
+                BluetoothProvider().startScan();
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return Dialog(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Center(
+                              child: CircleAvatar(
+                                backgroundColor: darkBlueGrayColor,
+                                radius: 35,
+                                child: Icon(
+                                  Icons.bluetooth_rounded,
+                                  color: whiteColor,
+                                  size: 30,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4.0),
+                              child: Text(
+                                'The scan button is disabled, please turn on bluetooth to enable the button. Then start the scan by tapping on the search button near bottom right.',
+                                style: TextStyle(
+                                  color: darkBlackColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            MaterialButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              color: darkBlueGrayColor,
+                              minWidth: double.infinity,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: const Text(
+                                'Okay',
+                                style: TextStyle(
+                                  color: whiteColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+            },
+            backgroundColor: darkBlueGrayColor,
+            splashColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            child: Icon(
+              bluetoothStatus
+                  ? CupertinoIcons.search
+                  : Icons.bluetooth_disabled_rounded,
+            ),
+          );
         },
-        backgroundColor: darkBlueGrayColor,
-        splashColor: Colors.transparent,
-        hoverColor: Colors.transparent,
-        child: const Icon(
-          CupertinoIcons.search,
-        ),
       ),
     );
   }
