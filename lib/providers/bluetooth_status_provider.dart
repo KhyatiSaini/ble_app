@@ -1,5 +1,5 @@
 import 'package:ble_app/services/bluetooth_status_checker.dart';
-import 'package:ble_app/utilities/enum.dart';
+import 'package:ble_app/utilities/enums.dart';
 import 'package:flutter/foundation.dart';
 
 class BluetoothStatusProvider extends ChangeNotifier {

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ble_app/utilities/enum.dart';
+import 'package:ble_app/utilities/enums.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BluetoothStatusChecker {
