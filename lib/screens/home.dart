@@ -1,7 +1,7 @@
 import 'package:ble_app/providers/bluetooth_provider.dart';
 import 'package:ble_app/providers/bluetooth_status_provider.dart';
 import 'package:ble_app/theme/colors.dart';
-import 'package:ble_app/utilities/enum.dart';
+import 'package:ble_app/utilities/enums.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -73,42 +73,61 @@ class Home extends StatelessWidget {
                   if (bluetoothDevice.name.trim().isNotEmpty) {
                     deviceName = bluetoothDevice.name.trim();
                   } else {
-                    deviceName = deviceID;
+                    deviceName = 'Bluetooth Device $deviceID';
                   }
 
-                  return Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(
-                      top: 8,
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: lightGrayColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            deviceName,
-                            style: const TextStyle(
-                              color: darkBlackColor,
-                              fontWeight: FontWeight.bold,
+                  return InkWell(
+                    onTap: () async {
+                      bool connected = await BluetoothProvider()
+                          .connectToDevice(bluetoothDevice);
+                      if (connected) {
+                        /// if connected, discover the services and read characteristics via [BluetoothProvider]
+                        // ignore: use_build_context_synchronously
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              Text('Successfully connected to $deviceName'),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          dismissDirection: DismissDirection.down,
+                          margin: const EdgeInsets.all(5),
+                        ));
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(
+                        top: 8,
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: lightGrayColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              deviceName,
+                              style: const TextStyle(
+                                color: darkBlackColor,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 3,
-                          ),
-                          Text(
-                            deviceID,
-                            style: const TextStyle(
-                              color: darkBlackColor,
+                            const SizedBox(
+                              height: 3,
                             ),
-                          ),
-                        ],
-                      )
-                    ]),
+                            Text(
+                              deviceID,
+                              style: const TextStyle(
+                                color: darkBlackColor,
+                              ),
+                            ),
+                          ],
+                        )
+                      ]),
+                    ),
                   );
                 },
                 itemCount: bluetoothProvider.scannedBluetoothDevices.length,

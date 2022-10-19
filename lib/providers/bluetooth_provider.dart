@@ -1,3 +1,4 @@
+import 'package:ble_app/utilities/error_codes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -137,8 +138,15 @@ class BluetoothProvider extends ChangeNotifier {
     if (_connectedDevice != null) {
       _services = await _connectedDevice!.discoverServices();
 
-      // todo: based on the discovery of brain service and error characteristic, notify the status of communication compatibility
       bool discoverSuccessful = discoverBrainNodes();
+      if (discoverSuccessful) {
+        /// if connected to the brain service, read the error characteristics
+        List<int> response = await readCharacteristics(errorCharacteristic!);
+        List<String> errorMessagesLogs = [];
+        for (int element in response) {
+          errorMessagesLogs.add(nodesError[element]!);
+        }
+      }
     }
   }
 
