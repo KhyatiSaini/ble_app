@@ -1,3 +1,3 @@
 enum BluetoothConnectionStatus { on, off }
 
-enum Components { brain, nodes }
+enum Component { brain, nodes }
