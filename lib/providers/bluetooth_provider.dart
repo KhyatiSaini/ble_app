@@ -117,7 +117,7 @@ class BluetoothProvider extends ChangeNotifier {
         }
       });
     } on PlatformException catch (e) {
-      if (e.code == 'already connected') {
+      if (e.code == 'already_connected') {
         debugPrint('already connected to the device $deviceDisplayName');
         _connectedDevice = selectedBluetoothDevice;
         discoverServices();
@@ -141,6 +141,7 @@ class BluetoothProvider extends ChangeNotifier {
       if (discoverSuccessful) {
         /// if connected to the brain service, read the error characteristics
         // todo: receive response from the connected BLE device, parse the error code to determine the reason for error
+        readCharacteristics(errorCharacteristic!);
       }
     }
   }
@@ -173,20 +174,19 @@ class BluetoothProvider extends ChangeNotifier {
   }
 
   /// function to read data of a particular [characteristic]
-  Future<List<int>> readCharacteristics(
-      BluetoothCharacteristic characteristic) async {
-    final List<int> readValue =
-        await characteristic.read().onError((error, stackTrace) {
+  Future readCharacteristics(BluetoothCharacteristic characteristic) async {
+    var readValue = await characteristic.read().onError((error, stackTrace) {
       debugPrint('error while read ${error.toString()}');
       return [];
     });
+
+    print('read characteristics');
+    print(readValue.toString());
 
     if (readValue.isNotEmpty) {
       debugPrint(readValue.toString());
       return readValue;
     }
-
-    return [];
   }
 
   /// function to write data to a [characteristic]
